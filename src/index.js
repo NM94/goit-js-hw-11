@@ -3,6 +3,7 @@ import Notiflix from 'notiflix';
 import SimpleLightbox from "simplelightbox";
 import "simplelightbox/dist/simple-lightbox.min.css";
 let search;
+let numPage = 1;
 let reLoad = true;
 
 
@@ -35,7 +36,7 @@ function handlerForm(evt) {
 
 
 function searchCard() {
-servicePicture(search,numPage)
+servicePicture(search)
  .then(resp => {
    if (resp.data.total === 0) {
 Notiflix.Notify.failure('Sorry, there are no images matching your search query. Please try again.')

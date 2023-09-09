@@ -14,8 +14,8 @@ async function servicePicture(search,numPage) {
     per_page: 40
   })
   
-    const response = await axios.get(`${BASE_URL}?${params}`);
-  console.log(response)
+  const response = await axios.get(`${BASE_URL}?${params}`);
+  
   return response
 }
 
