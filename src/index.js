@@ -1,7 +1,9 @@
-import axios from "axios";
+import { servicePicture } from "./api_key";
 import Notiflix from 'notiflix';
 import SimpleLightbox from "simplelightbox";
 import "simplelightbox/dist/simple-lightbox.min.css";
+let search;
+let reLoad = true;
 
 
 const elements = {
@@ -11,15 +13,14 @@ const elements = {
   btnLoad: document.querySelector('.load-more'),
   lightbox: new SimpleLightbox('.gallery a')
 }
-let search;
-let numPage = 1;
-let reLoad = true;
+
 
 
 elements.form.addEventListener('submit', handlerForm)
 
 function handlerForm(evt) {
   evt.preventDefault()
+  
   if (search === elements.input.value) {
     numPage += 1
     reLoad = false;
@@ -34,9 +35,9 @@ function handlerForm(evt) {
 
 
 function searchCard() {
-servicePicture()
+servicePicture(search,numPage)
  .then(resp => {
- if(resp.data.total === 0) {
+   if (resp.data.total === 0) {
 Notiflix.Notify.failure('Sorry, there are no images matching your search query. Please try again.')
  } else {
 if(reLoad) {
@@ -47,7 +48,15 @@ if(resp.data.hits.length < 40) {
  elements.btnLoad.style.display = 'none'
  } else {
  elements.btnLoad.style.display = 'inline'
- }
+     }
+     const totalHits = resp.data.totalHits;
+      const totalPage = totalHits / 40;
+      if (numPage > totalPage) {
+        elements.btnLoad.style.display = 'none'
+        Notiflix.Notify.warning(
+          "We're sorry, but you've reached the end of search results."
+        );
+      }
  createMarkup(resp.data)
                 
  }
@@ -57,29 +66,6 @@ if(resp.data.hits.length < 40) {
  Notiflix.Notify.warning('Oops! Something went wrong! Try reloading the page!')
  })
 }
-
-
-async function servicePicture(){
-const API_KEY = '39225038-2ac54e14fe4534aeff5d9228c'
-  const BASE_URL = 'https://pixabay.com/api/';
-  
-  const params = new URLSearchParams({
-    key: API_KEY,
-    q: search,
-    image_type: 'photo',
-    orientation: 'horizontal',
-    safesearch: 'true',
-    page: numPage,
-    per_page: 40
-  })
-  
-    const response = await axios.get(`${BASE_URL}?${params}`);
-  console.log(response)
-  return response
-}
-
-
-
 
 const defaults = {
 image: 'https://static.thenounproject.com/png/2616533-200.png'
@@ -119,3 +105,6 @@ elements.btnLoad.addEventListener('click', function() {
     reLoad = false
     searchCard()
 })
+
+
+
